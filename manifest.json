@@ -11,7 +11,7 @@
   "icons": [
     {
       "src": "PROYECTO.png",
-      "sizes": "192x192",
+      "sizes": "295x295",
       "type": "image/png"
     },
     {
@@ -22,3 +22,4 @@
   ]
 
 }
+
