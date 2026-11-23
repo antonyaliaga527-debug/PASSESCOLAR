@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f2c59">
+    <title>PassEscolar - Unidad Educativa Tecnológica 25 de Julio "B"</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="PROYECTO.css">
+</head>
+<body>
+
+    <!-- PANTALLA 1: INICIO -->
+    <main id="pantalla-1" class="vista activa">
+        <div class="caja-central">
+            <span class="insignia">U.E. Tecnológica 25 de Julio "B"</span>
+
+            <!-- ENCABEZADO CON LOGO DEL COLEGIO Y PASSESCOLAR -->
+            <div class="marca-inicio">
+                <img src="PROYECTO.png" alt='Logo Unidad Educativa Tecnológica 25 de Julio "B"' class="logo-limpio">
+                <h1>PassEscolar</h1>
+            </div>
+
+            <div class="servicios-box">
+                <p>Servicios Escolares Digitales</p>
+                <ul>
+                    <li>Solicitud de licencias médicas y personales</li>
+                    <li>Autorización de retiros anticipados</li>
+                    <li>Control y seguimiento en tiempo real</li>
+                </ul>
+            </div>
+
+            <button type="button" id="btn-registrar-estudiante" class="btn-aceptar">
+                Registrar estudiante
+            </button>
+        </div>
+    </main>
+
+    <!-- PANTALLA 2: DATOS DEL ESTUDIANTE -->
+    <main id="pantalla-2" class="vista oculta">
+        <div class="caja-central">
+            <div class="cabecera-paso">
+                <span class="paso-tag">Paso 1 de 2</span>
+                <h2>Datos del Estudiante</h2>
+                <p class="subtexto">Completa la información para continuar</p>
+            </div>
+
+            <form id="form-vinculacion" novalidate>
+                <div class="campo">
+                    <label for="nombre-estudiante">Nombre completo del estudiante</label>
+                    <input
+                        type="text"
+                        id="nombre-estudiante"
+                        placeholder="Ej. Jhojan Antony Aliaga Salas"
+                        required
+                    >
+                    <small id="error-nombre" class="mensaje-error oculto"></small>
+                </div>
+
+                <div class="campo">
+                    <label for="curso-estudiante">Selecciona el curso</label>
+                    <select id="curso-estudiante" required>
+                        <option value="" disabled selected>-- Selecciona el curso --</option>
+                        <option value="1ro de Secundaria">1ro de Secundaria</option>
+                        <option value="2do de Secundaria">2do de Secundaria</option>
+                        <option value="3ro de Secundaria">3ro de Secundaria</option>
+                        <option value="4to de Secundaria">4to de Secundaria</option>
+                        <option value="5to de Secundaria">5to de Secundaria</option>
+                        <option value="6to de Secundaria">6to de Secundaria</option>
+                    </select>
+                </div>
+
+                <div id="apartado-paralelo" class="campo oculto">
+                    <label>Selecciona el paralelo</label>
+                    <div class="grupo-roles">
+                        <label class="tarjeta-rol">
+                            <input type="radio" name="paralelo" value="A">
+                            <span>A</span>
+                        </label>
+                        <label class="tarjeta-rol">
+                            <input type="radio" name="paralelo" value="B">
+                            <span>B</span>
+                        </label>
+                        <label class="tarjeta-rol">
+                            <input type="radio" name="paralelo" value="C">
+                            <span>C</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label>Selecciona tu parentesco</label>
+                    <div class="grupo-roles">
+                        <label class="tarjeta-rol">
+                            <input type="radio" name="rol" value="Padre" required>
+                            <span>Padre</span>
+                        </label>
+                        <label class="tarjeta-rol">
+                            <input type="radio" name="rol" value="Madre">
+                            <span>Madre</span>
+                        </label>
+                        <label class="tarjeta-rol">
+                            <input type="radio" name="rol" value="Tutor">
+                            <span>Tutor</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-aceptar">Aceptar</button>
+                <button type="button" id="btn-cancelar" class="btn-texto">Cancelar y volver</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- PANTALLA 3: PANEL PRINCIPAL Y MENÚ -->
+    <main id="pantalla-3" class="vista oculta">
+        <div class="caja-central">
+            <span class="insignia-exito">Registro Guardado</span>
+            <h2>Bienvenido a PassEscolar</h2>
+            <p class="subtexto">Panel de control del estudiante</p>
+
+            <div class="resumen-usuario" id="datos-guardados"></div>
+
+            <!-- MENÚ DE NAVEGACIÓN DEL PANEL -->
+            <nav class="menu-panel" aria-label="Menú principal">
+                <button type="button" id="tab-resumen" class="tab-btn activo">Resumen</button>
+                <button type="button" id="tab-registro-permisos" class="tab-btn">
+                    Registro de permisos <span id="contador-permisos" class="badge-contador">0</span>
+                </button>
+            </nav>
+
+            <!-- APARTADO 1 DEL MENÚ: RESUMEN RÁPIDO -->
+            <div id="vista-resumen">
+                <div id="resumen-licencia" class="resumen-licencia oculto"></div>
+
+                <button type="button" id="btn-nueva-licencia" class="btn-aceptar">
+                    + Solicitar Nueva Licencia
+                </button>
+            </div>
+
+            <!-- APARTADO 2 DEL MENÚ: REGISTRO DE PERMISOS -->
+            <section id="vista-registro-permisos" class="registro-box oculto">
+                <div class="registro-cabecera">
+                    <h3>Registro de permisos</h3>
+                    <span id="total-dias-permiso" class="subtexto-mini">0 permiso(s) registrados</span>
+                </div>
+
+                <div id="lista-permisos-guardados" class="lista-permisos"></div>
+
+                <!-- TARJETA PARA SACAR / VER JUSTIFICACIÓN -->
+                <div id="visor-justificacion" class="visor-justificacion oculto"></div>
+            </section>
+
+            <button type="button" id="btn-cerrar-sesion" class="btn-texto">Volver al inicio</button>
+        </div>
+    </main>
+
+    <!-- PANTALLA 4: CUESTIONARIO DE LICENCIA -->
+    <main id="pantalla-4" class="vista oculta">
+        <div class="caja-central">
+            <div class="cabecera-paso">
+                <span class="paso-tag">Paso 2 de 2</span>
+                <h2>Cuestionario de Licencia</h2>
+                <p class="subtexto">Indique el motivo de ausencia o permiso del estudiante</p>
+            </div>
+
+            <div id="mini-ficha-estudiante" class="mini-ficha"></div>
+
+            <form id="form-licencia" novalidate>
+                <div class="campo">
+                    <label>¿Cuál es el motivo de la licencia?</label>
+                    <div class="lista-motivos">
+                        <label class="opcion-motivo">
+                            <input type="radio" name="motivo" value="Situación de enfermedad" required>
+                            <span>Situación de enfermedad</span>
+                        </label>
+                        <label class="opcion-motivo">
+                            <input type="radio" name="motivo" value="Urgencia familiar">
+                            <span>Urgencia familiar</span>
+                        </label>
+                        <label class="opcion-motivo">
+                            <input type="radio" name="motivo" value="Cita médica programada">
+                            <span>Cita médica programada</span>
+                        </label>
+                        <label class="opcion-motivo">
+                            <input type="radio" name="motivo" value="Trámite o viaje personal">
+                            <span>Trámite o viaje personal</span>
+                        </label>
+                        <label class="opcion-motivo">
+                            <input type="radio" name="motivo" value="Otro motivo">
+                            <span>Otro motivo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label id="label-detalle-licencia" for="detalle-licencia">
+                        Descripción (opcional)
+                    </label>
+                    <textarea
+                        id="detalle-licencia"
+                        rows="3"
+                        placeholder="Escribe aquí por qué estás pidiendo el permiso..."
+                    ></textarea>
+                    <small id="error-detalle" class="mensaje-error oculto"></small>
+                </div>
+
+                <button type="submit" class="btn-aceptar">Enviar Solicitud de Licencia</button>
+                <button type="button" id="btn-volver-panel" class="btn-texto">Volver al panel</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="PROYECTO.js"></script>
+</body>
+</html>
