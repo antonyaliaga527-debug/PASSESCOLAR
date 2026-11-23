@@ -297,6 +297,8 @@ textarea:focus {
     margin-top: 13px;
     cursor: pointer;
     text-decoration: underline;
+    display: block;
+    width: 100%;
 }
 
 .btn-texto:hover {
@@ -550,6 +552,7 @@ textarea:focus {
     .menu-panel,
     #btn-nueva-licencia,
     #btn-cerrar-sesion,
+    #btn-cambiar-estudiante,
     .btn-justificacion,
     .acciones-justificacion {
         display: none !important;
