@@ -10,15 +10,16 @@
   "theme_color": "#0f2c59",
   "icons": [
     {
-      "src": "proyecto.png",
+      "src": "PROYECTO.png",
       "sizes": "295x295",
       "type": "image/png"
     },
     {
-      "src": "proyecto.png",
+      "src": "PROYECTO.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 }
+
 
