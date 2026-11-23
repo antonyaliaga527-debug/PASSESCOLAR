@@ -6,7 +6,7 @@ const ASSETS = [
   './PROYECTO.js',
   './manifest.json',
   './PROYECTO.png',
-  './proyecto.png',
+  './PROYECTO.png',
   './icon-512.png'
 ];
 
@@ -31,3 +31,4 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
+
