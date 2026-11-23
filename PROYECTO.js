@@ -39,16 +39,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorDetalle = document.getElementById('error-detalle');
     const btnVolverPanel = document.getElementById('btn-volver-panel');
 
+    function normalizarClaveEstudiante(datos) {
+        if (!datos || !datos.estudiante) return 'sin_estudiante';
+        const nombre = datos.estudiante.trim().toLowerCase().replace(/\s+/g, '_');
+        const curso = (datos.curso || '').trim().toLowerCase().replace(/\s+/g, '_');
+        const paralelo = (datos.paralelo || '').trim().toLowerCase();
+        return `${nombre}__${curso}__${paralelo}`;
+    }
+
     function obtenerEstudiante() {
         return JSON.parse(localStorage.getItem('passEscolarEstudiante')) || null;
     }
 
-    function obtenerPermisos() {
-        return JSON.parse(localStorage.getItem('passEscolarPermisos')) || [];
+    function obtenerMapaPermisos() {
+        return JSON.parse(localStorage.getItem('passEscolarPermisosPorEstudiante')) || {};
     }
 
-    function guardarPermisos(permisos) {
-        localStorage.setItem('passEscolarPermisos', JSON.stringify(permisos));
+    function guardarMapaPermisos(mapa) {
+        localStorage.setItem('passEscolarPermisosPorEstudiante', JSON.stringify(mapa));
+    }
+
+    function obtenerPermisos(estudiante = obtenerEstudiante()) {
+        const clave = normalizarClaveEstudiante(estudiante);
+        const mapa = obtenerMapaPermisos();
+        return Array.isArray(mapa[clave]) ? mapa[clave] : [];
+    }
+
+    function guardarPermisos(permisos, estudiante = obtenerEstudiante()) {
+        const clave = normalizarClaveEstudiante(estudiante);
+        const mapa = obtenerMapaPermisos();
+        mapa[clave] = permisos;
+        guardarMapaPermisos(mapa);
+    }
+
+    function renderizarDatosEstudiante(datos) {
+        if (!datos) return;
+        contenedorDatos.innerHTML = `
+            <p><strong>Estudiante:</strong> ${datos.estudiante}</p>
+            <p><strong>Curso:</strong> ${datos.curso}</p>
+            <p><strong>Paralelo:</strong> ${datos.paralelo}</p>
+            <p><strong>Representante:</strong> ${datos.rol}</p>
+        `;
+    }
+
+    function actualizarContadorEnPanel() {
+        const permisos = obtenerPermisos();
+        contadorPermisos.textContent = String(permisos.length);
     }
 
     function activarPestanaPanel(pestana) {
@@ -64,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             vistaResumen.classList.remove('oculta');
             vistaRegistroPermisos.classList.add('oculta');
             visorJustificacion.classList.add('oculta');
+            actualizarContadorEnPanel();
         }
     }
 
@@ -71,13 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
     tabRegistroPermisos.addEventListener('click', () => activarPestanaPanel('registro'));
 
     function renderizarRegistroPermisos() {
-        const permisos = obtenerPermisos();
+        const estudiante = obtenerEstudiante();
+        const permisos = obtenerPermisos(estudiante);
         contadorPermisos.textContent = String(permisos.length);
-        totalDiasPermiso.textContent = `${permisos.length} permiso(s) / día(s) registrados`;
+        totalDiasPermiso.textContent = `${permisos.length} permiso(s) / día(s) de ${estudiante ? estudiante.estudiante : 'este estudiante'}`;
 
         if (permisos.length === 0) {
             listaPermisosGuardados.innerHTML = `
-                <p class="sin-permisos">Aún no hay permisos registrados en este historial.</p>
+                <p class="sin-permisos">Este estudiante aún no tiene permisos registrados en su historial.</p>
             `;
             return;
         }
@@ -197,7 +235,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-registrar-estudiante').addEventListener('click', () => {
-        mostrarPantalla('pantalla-2');
+        const guardado = obtenerEstudiante();
+        if (guardado && guardado.estudiante) {
+            renderizarDatosEstudiante(guardado);
+            resumenLicencia.classList.add('oculta');
+            visorJustificacion.classList.add('oculta');
+            activarPestanaPanel('resumen');
+            mostrarPantalla('pantalla-3');
+        } else {
+            mostrarPantalla('pantalla-2');
+        }
     });
 
     document.getElementById('btn-cancelar').addEventListener('click', () => {
@@ -245,13 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const datos = { estudiante: nombre, curso, paralelo, rol };
         localStorage.setItem('passEscolarEstudiante', JSON.stringify(datos));
 
-        contenedorDatos.innerHTML = `
-            <p><strong>Estudiante:</strong> ${nombre}</p>
-            <p><strong>Curso:</strong> ${curso}</p>
-            <p><strong>Paralelo:</strong> ${paralelo}</p>
-            <p><strong>Representante:</strong> ${rol}</p>
-        `;
-
+        renderizarDatosEstudiante(datos);
+        resumenLicencia.classList.add('oculta');
+        visorJustificacion.classList.add('oculta');
         renderizarRegistroPermisos();
         activarPestanaPanel('resumen');
         mostrarPantalla('pantalla-3');
@@ -338,9 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
             fechaHora
         };
 
-        const permisosActuales = obtenerPermisos();
+        const permisosActuales = obtenerPermisos(datosGuardados);
         permisosActuales.unshift(nuevoPermiso);
-        guardarPermisos(permisosActuales);
+        guardarPermisos(permisosActuales, datosGuardados);
 
         resumenLicencia.innerHTML = `
             <p><strong>Licencia Guardada · Folio ${folio}</strong></p>
@@ -359,7 +402,21 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarPantalla('pantalla-3');
     });
 
+    const estudianteInicial = obtenerEstudiante();
+    if (estudianteInicial && estudianteInicial.estudiante) {
+        renderizarDatosEstudiante(estudianteInicial);
+        renderizarRegistroPermisos();
+        activarPestanaPanel('resumen');
+        mostrarPantalla('pantalla-3');
+    }
+
     document.getElementById('btn-cerrar-sesion').addEventListener('click', () => {
+        resumenLicencia.classList.add('oculta');
+        visorJustificacion.classList.add('oculta');
+        mostrarPantalla('pantalla-1');
+    });
+
+    document.getElementById('btn-cambiar-estudiante').addEventListener('click', () => {
         formVinculacion.reset();
         formLicencia.reset();
         apartadoParalelo.classList.add('oculta');
@@ -368,6 +425,6 @@ document.addEventListener('DOMContentLoaded', () => {
         errorNombre.textContent = '';
         errorNombre.classList.add('oculta');
         inputNombre.classList.remove('input-error');
-        mostrarPantalla('pantalla-1');
+        mostrarPantalla('pantalla-2');
     });
 });
